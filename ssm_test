@@ -1,0 +1,13 @@
+resource "aws_ssm_parameter" "common_dev_web_url" {
+  name  = "/common/dev/web_url"
+  type  = "String"
+  value = "https://www-dev.example.com"
+}
+
+
+
+resource "aws_ssm_parameter" "service_1_dev_db_user" {
+  name  = "/service_1/dev/db_user"
+  type  = "String"
+  value = "service_1-dbuser"
+}

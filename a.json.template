@@ -1,0 +1,47 @@
+{
+  "shared": [
+    {
+      "name": "web_url",
+      "value": "https://www-{{ ENVIRONMENT }}.example.com",
+      "type": "template"
+    },
+    {
+      "name": "service_url",
+      "value": "https://ids-{{ ENVIRONMENT }}.example.com",
+      "type": "template"
+    },
+    {
+      "name": "other_keys",
+      "value": "any_value",
+      "type": "static"
+    }
+  ],
+  "specific": [
+    {
+      "name": "dbpassword",
+      "value": "ATUO",
+      "type": "auto_gen"
+    },
+    {
+      "name": "db_user",
+      "value": "{{ SERVICE_NAME }}-dbuser",
+      "type": "template"
+    },
+    {
+      "name": "timeout",
+      "value": "300",
+      "type": "static"
+    }
+  ],
+  "overrides": {
+    "dev": [
+      {
+        "name": "timeout",
+        "value": "100",
+        "type": "static"
+      }
+    ],
+    "uat": [],
+    "prod": []
+  }
+}

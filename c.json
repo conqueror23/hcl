@@ -1,0 +1,7 @@
+
+{"name":"/common/dev/web_url","value":"https://www-dev.example.com"}
+,{"name":"/common/dev/service_url","value":"https://ids-dev.example.com"}
+,{"name":"/common/dev/other_keys","value":"any_value"}
+,{"name":"/service_1/dev/dbpassword","value":"ATUO"}
+,{"name":"/service_1/dev/db_user","value":"service_1-dbuser"}
+,{"name":"/service_1/dev/timeout","value":"100"}

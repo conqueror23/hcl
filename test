@@ -1,0 +1,167 @@
+Hi Bolong,
+
+NOTES: Please remain confidential.
+
+If you have any questions you may ask at any time.
+
+Requirements:
+
+Input:
+
+(1) environment variables: (get with "process.env.<VARIABLE>")
+
+ENVIRONMENT - environment variable, such as dev, uat, or prod
+SERVICE_NAME - Service name, can be string from [0-9][a-z][A-Z][-_], without space in it
+
+(2) A json template file (a.json.template)
+
+##############################
+
+{
+  "shared": [
+    {
+      "name": "web_url",
+      "value": "https://www-{{ ENVIRONMENT }}.example.com",
+      "type": "template"
+    },
+    {
+      "name": "service_url",
+      "value": "https://ids-{{ ENVIRONMENT }}.example.com",
+      "type": "template"
+    },
+    {
+      "name": "other_keys",
+      "value": "any_value",
+      "type": "static"
+    }
+  ],
+  "specific": [
+    {
+      "name": "dbpassword",
+      "value": "ATUO",
+      "type": "auto_gen"
+    },
+    {
+      "name": "db_user",
+      "value": "{{ SERVICE_NAME }}-dbuser",
+      "type": "template"
+    },
+    {
+      "name": "timeout",
+      "value": "300",
+      "type": "static"
+    }
+  ],
+  "overrides": {
+    "dev": [
+      {
+        "name": "timeout",
+        "value": "100",
+        "type": "static"
+      }
+    ],
+    "uat": [],
+    "prod": []
+  }
+}
+
+##############################
+
+Output:
+
+* Level #1
+
+export SERVICE_NAME="service_1"
+export ENVIRONMENT="dev"
+convert.js -i <path>/a.json.template -o <new_path>/a.json
+
+[
+  {
+    "name": "/common/dev/web_url",
+    "value": "https://www-dev.example.com"
+  },
+  {
+    "name": "/common/dev/service_url",
+    "value": "https://ids-dev.example.com"
+  },
+  {
+    "name": "/common/dev/other_keys",
+    "value": "any_value"
+  },
+  {
+    "name": "/service_1/dev/dbpassword",
+    "value": "MASKED"
+  },
+  {
+    "name": "/service_1/dev/db_user",
+    "value": "service_1-dbuser"
+  },
+  {
+    "name": "/service_1/dev/timeout",
+    "value": "100"
+  }
+]
+
+* Level #2
+
+Create aws ssm parameter store keys base on above JSON file (a.json) with terraform HCL (https://www.terraform.io/docs/providers/aws/r/ssm_parameter.html) files
+
+resource "aws_ssm_parameter" "common_dev_web_url" {
+  name  = "/common/dev/web_url"
+  type  = "String"
+  value = "https://www-dev.example.com"
+}
+
+...
+
+resource "aws_ssm_parameter" "service_1_dev_db_user" {
+  name  = "/service_1/dev/db_user"
+  type  = "String"
+  value = "service_1-dbuser"
+}
+
+...
+
+* Level #3
+
+db password shouldn't be managed by terraform, because terraform will show password as plain text. Manage password with node aws sdk and reset password when we need apply the change.
+
+Rules:
+
+1. type can be:
+template (replaced with environment variables)
+auto_gen (refresh with new random password)
+static (value which is not changed. Maybe we still use type:template to simply the codes later)
+
+2. ssm parameter key name in shared will be /common/<env>/<key_name>, for example:
+
+/common/dev/web_url
+
+3. key in specific will be /<service_name>/<dev>/<key_name>, for example:
+
+/server_1/uat/dbpassword
+
+4. key in overrides will have higher priority for that particular environment. For example:
+
+/server_1/dev/timeout, its value will be 100, not 300
+
+What you can start with
+
+(1) know how to handle json to get the keys and values +1
+(2) Know how to convert jinja2 template to real json file from two environment variables (SERVICE_NAME and EVNIRONMENT) +1
+
+you can use node package "swig-templates" for a quick job.
+
+(3) convert the template (a.json.template) to a.json with real SERVICE_NAME and ENVIRONMENT . (outout level #1) . +5
+
+(4) convert to HCL files (output level #2) +5
+
+(5) manage db password or other "auto_gen" keys within nodejs directly. (output level #3) +3
+
+You should finish in 7 days. No pressure to do all, I will give you time to learn if we accept you.
+
+Share every level step with code, so I can understand how quick you can code and make sure you are in right direction.
+
+If you have any questions, let me know.
+
+Good luck.
